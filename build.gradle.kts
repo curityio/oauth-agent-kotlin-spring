@@ -38,9 +38,9 @@ dependencies {
 	testImplementation("org.apache.httpcomponents:httpclient:4.5.14")
 
 	/*
-	   PROBLEM: Groovy tests no longer work if I upgrade to Spring 3.
-	   The OAuthAgentConfiguration is not autowired into TokenHandlerSpecification.groovy.
-	   Caused by having to remove @ConstructorBinding from OAuthAgentConfigurationProperties.
+	   PROBLEM: Groovy tests no longer work if I upgrade to Spring 3
+	   The OAuthAgentConfiguration is not autowired into TokenHandlerSpecification.groovy
+	   Perhaps caused by having to remove @ConstructorBinding from OAuthAgentConfigurationProperties
 	 */
 }
 
