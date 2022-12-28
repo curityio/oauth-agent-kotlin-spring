@@ -1,0 +1,31 @@
+VERSION UPDATES
+---------------
+1. 2.7.7 plugin to latest
+
+2. Node.js updates
+   Version 18 Dockerfile
+   Allow insecure flag
+
+3. Deployment testing against branches
+
+WORK
+----
+1. Get tests running, startin with only
+
+1. Get integration tests running for both development cases
+   ./gradlew test and select a yaml file
+
+2. Get docs properly updated for both cases
+   Add a tests documents file
+   Update the main README
+
+3. Update dependencies and re-run both sets of tests
+
+4. Implement authorization code grant
+   Kotlin and Node at the same time
+
+5. Get deployment working from a branch
+
+LATER
+-----
+1. Make SSL enabled conditional on SERVER_CERT_P12_PATH being set
