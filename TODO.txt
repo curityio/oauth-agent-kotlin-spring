@@ -1,31 +1,23 @@
 VERSION UPDATES
 ---------------
-1. 2.7.7 plugin to latest
+1. Node.js updates, including version 18 Dockerfile and possibly insecure flag
 
-2. Node.js updates
-   Version 18 Dockerfile
-   Allow insecure flag
-
-3. Deployment testing against branches
-
-WORK
-----
-1. Get tests running, startin with only
-
-1. Get integration tests running for both development cases
-   ./gradlew test and select a yaml file
-
-2. Get docs properly updated for both cases
-   Add a tests documents file
-   Update the main README
-
-3. Update dependencies and re-run both sets of tests
-
-4. Implement authorization code grant
-   Kotlin and Node at the same time
-
-5. Get deployment working from a branch
+2. Deployment testing against branches
 
 LATER
 -----
 1. Make SSL enabled conditional on SERVER_CERT_P12_PATH being set
+
+2. Fix v3.0 plugin issues with testing, eg wiremock
+   Wiremock has problems, meaning standalone should be used.
+   But then test configuration no longer loads
+   https://github.com/wiremock/wiremock/issues/1760
+
+    implementation("org.apache.groovy:groovy:4.0.7")
+	implementation("org.apache.groovy:groovy-json:4.0.7")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:3.0.1")
+	testImplementation(platform("org.spockframework:spock-bom:2.3-groovy-4.0"))
+	testImplementation("org.spockframework:spock-core:2.3-groovy-4.0")
+	testImplementation("org.spockframework:spock-spring:2.3-groovy-4.0")
+	testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
+	testImplementation("org.apache.httpcomponents:httpclient:4.5.14")
