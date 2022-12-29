@@ -76,7 +76,6 @@ class LoginControllerSpec extends TokenHandlerSpecification {
 
     def "Request to start login should return authorization request URL"() {
         given:
-        def requestURI = "standardRequestURI"
         def request = getRequestWithValidOrigin(POST, loginStartURI)
 
         when:
