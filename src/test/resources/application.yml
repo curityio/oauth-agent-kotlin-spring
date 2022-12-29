@@ -27,5 +27,6 @@ oauthagent:
 
 server:
   ssl:
+    enabled: true
     key-store: classpath:certs/example.server.test.p12
     key-store-password: Password1

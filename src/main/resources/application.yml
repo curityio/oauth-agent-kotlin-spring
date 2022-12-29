@@ -28,6 +28,6 @@ oauthagent:
 server:
   port: ${PORT:8080}
   ssl:
-    enabled: false
+    enabled: ${USE_SSL:false}
     key-store: ${SERVER_CERT_P12_PATH:./certs/example.server.p12}
     key-store-password: ${SERVER_CERT_P12_PASSWORD:Password1}
