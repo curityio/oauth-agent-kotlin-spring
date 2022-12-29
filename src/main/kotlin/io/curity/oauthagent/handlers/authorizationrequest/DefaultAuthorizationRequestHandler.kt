@@ -7,6 +7,9 @@ import io.curity.oauthagent.hash
 import org.springframework.stereotype.Service
 import java.net.URLEncoder
 
+/*
+ * Creates the details for a plain OpenID Connect code flow
+ */
 @Service
 class DefaultAuthorizationRequestHandler(
         private val config: OAuthAgentConfiguration,

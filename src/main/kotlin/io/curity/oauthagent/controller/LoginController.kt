@@ -4,10 +4,8 @@ import io.curity.oauthagent.*
 import io.curity.oauthagent.handlers.authorizationrequest.AuthorizationRequestHandler
 import io.curity.oauthagent.exception.AuthorizationResponseException
 import io.curity.oauthagent.exception.CookieDecryptionException
-import io.curity.oauthagent.exception.InvalidResponseJwtException
+import io.curity.oauthagent.handlers.authorizationresponse.AuthorizationResponseHandler
 import org.jose4j.jwt.JwtClaims
-import org.jose4j.jwt.consumer.InvalidJwtException
-import org.jose4j.jwt.consumer.JwtConsumer
 import org.springframework.http.HttpHeaders.SET_COOKIE
 import org.springframework.http.server.reactive.ServerHttpResponse
 import org.springframework.http.server.reactive.ServerHttpRequest
@@ -16,18 +14,17 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.util.UriComponentsBuilder
 
 @RestController
 @CrossOrigin
 @RequestMapping("/\${oauthagent.endpointsPrefix}/login")
 class LoginController(
         private val authorizationRequestHandler: AuthorizationRequestHandler,
+        private val authorizationResponseHandler: AuthorizationResponseHandler,
         private val cookieName: CookieName,
         private val cookieEncrypter: CookieEncrypter,
         private val authorizationServerClient: AuthorizationServerClient,
-        private val requestValidator: RequestValidator,
-        private val jwtConsumer: JwtConsumer
+        private val requestValidator: RequestValidator
 )
 {
     @PostMapping("/start", consumes = ["application/json"])
@@ -64,7 +61,7 @@ class LoginController(
             ValidateRequestOptions(requireCsrfHeader = false)
         )
 
-        val queryParams = processOAuthLoginResponse(body.pageUrl)
+        val queryParams = authorizationResponseHandler.handleResponse(body.pageUrl)
         val isOAuthResponse = queryParams.state != null && queryParams.code != null
 
         val isLoggedIn: Boolean
@@ -94,20 +91,16 @@ class LoginController(
                 }
             }
 
-            // Write the SameSite cookies
             val cookiesToSet = authorizationServerClient.getCookiesForTokenResponse(tokenResponse, true, csrfToken)
             response.headers[SET_COOKIE] = cookiesToSet
 
             isLoggedIn = true
         } else
         {
-            // See if we have a session cookie
+            // During a page reload, return the existing anti forgery token
             isLoggedIn = request.getCookie(cookieName.accessToken) != null
-
             if (isLoggedIn)
             {
-                // During an authenticated page refresh or opening a new browser tab, we must return the anti forgery token
-                // This enables an XSS attack to get the value, but this is standard for CSRF tokens
                 csrfToken = cookieEncrypter.decryptValueFromCookie(request.getCookie(cookieName.csrf)!!)
             }
         }
@@ -117,37 +110,6 @@ class LoginController(
             isLoggedIn,
             csrfToken
         )
-    }
-
-    private fun processOAuthLoginResponse(pageUrl: String?): OAuthQueryParams
-    {
-        if (pageUrl == null)
-        {
-            return OAuthQueryParams(null, null)
-        }
-
-        val queryParams = UriComponentsBuilder.fromUriString(pageUrl).build().queryParams
-
-        if (queryParams["response"] == null)
-        {
-            return OAuthQueryParams(null, null)
-        }
-
-        try
-        {
-            val responseClaims = jwtConsumer.processToClaims(queryParams["response"]!!.first())
-            val code = responseClaims.getStringClaimValue("code")
-            val state = responseClaims.getStringClaimValue("state")
-            if (!code.isNullOrBlank() && !state.isNullOrBlank()) {
-                return OAuthQueryParams(code, state)
-            }
-
-            throw getAuthorizationResponseError(responseClaims)
-
-        } catch (exception: InvalidJwtException)
-        {
-            throw InvalidResponseJwtException(exception)
-        }
     }
 
     private fun ServerHttpRequest.getCookie(cookieName: String): String? =

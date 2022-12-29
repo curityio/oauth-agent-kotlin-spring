@@ -23,23 +23,6 @@ class IdsvrStubs {
     @Autowired
     private OAuthAgentConfiguration configuration
 
-    def idsvrRespondsToParRequest() {
-        stubFor(post(PAREndpointPath)
-                .willReturn(aResponse()
-                        .withBody(toJson([request_uri: "abcdef", expires_in: 100]))
-                        .withHeader("Content-Type", "application/json")
-                        .withStatus(200)
-                ))
-    }
-
-    def idsvrRespondsToJWKSRequest() {
-        stubFor(get(JWKSEndpointPath).willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody("{\"keys\": [" + rsaJsonWebKey.toJson() + "]}")
-        ))
-    }
-
     def idsvrRespondsWithTokens() {
         stubFor(post(getTokenEndpointPath())
                 .withRequestBody(containing("code=12345"))
@@ -76,14 +59,6 @@ class IdsvrStubs {
                         .withStatus(400)
                         .withBody("{error: invalid_client}")
                 ))
-    }
-
-    def getPAREndpointPath() {
-        (new URI(configuration.authorizeEndpoint)).path + "/par"
-    }
-
-    def getJWKSEndpointPath() {
-        (new URI(configuration.jwksUri)).path
     }
 
     def getTokenEndpointPath() {

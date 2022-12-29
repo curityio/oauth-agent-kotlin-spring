@@ -4,13 +4,10 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import groovy.json.JsonSlurper
 import org.apache.http.impl.client.HttpClients
 import org.jose4j.jwk.RsaJsonWebKey
-import org.jose4j.jws.AlgorithmIdentifiers
-import org.jose4j.jws.JsonWebSignature
-import org.jose4j.jwt.JwtClaims
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.RequestEntity
@@ -78,11 +75,10 @@ class TokenHandlerSpecification extends Specification {
     }
 
     protected def getCookiesAndCSRFForAuthenticatedUser() {
-        stubs.idsvrRespondsToParRequest()
         def startLoginRequest = getRequestWithValidOrigin(POST, loginStartURI)
         def startLoginResponse = client.exchange(startLoginRequest, String.class)
+
         def cookies = startLoginResponse.headers.get("Set-Cookie")
-        stubs.idsvrRespondsToJWKSRequest()
         stubs.idsvrRespondsWithTokens()
 
         def cookieHeaders = new HttpHeaders()
@@ -91,14 +87,13 @@ class TokenHandlerSpecification extends Specification {
         def request = getRequestWithValidOrigin(
                 POST,
                 loginEndURI,
-                toJson([pageUrl: "${configuration.redirectUri}?response=$validResponseJWT" ]),
+                toJson([pageUrl: "${configuration.redirectUri}?$validResponsePayload" ]),
                 cookieHeaders
         )
 
         def response = client.exchange(request, String.class)
         assert response.statusCode == OK
         def responseBody = json.parseText(response.body)
-
         [cookies: response.headers.get("Set-Cookie"), csrf: responseBody["csrf"]]
     }
 
@@ -126,53 +121,16 @@ class TokenHandlerSpecification extends Specification {
         new RequestEntity(body, headers, method, url)
     }
 
-    protected def getValidResponseJWT() {
-        getResponseJWT(rsaJsonWebKey, getResponseJWTPayload())
+    protected def getValidResponsePayload() {
+        return "code=12345&state=someState"
     }
 
-    protected def getFailedResponseJWT(String errorCode) {
-        getResponseJWT(rsaJsonWebKey, getResponseJWTErrorPayload(errorCode))
+    protected def getMaliciousResponsePayload() {
+        return "code=12345&state=mismatchedState"
     }
 
-    protected def getResponseJWTWithKey(RsaJsonWebKey webKey) {
-        getResponseJWT(webKey, getResponseJWTPayload())
-    }
-
-    protected def getResponseJWT(RsaJsonWebKey webKey, JwtClaims payload) {
-
-        def jws = new JsonWebSignature()
-        jws.setPayload(payload.toJson())
-        jws.setKey(webKey.getPrivateKey())
-        jws.setKeyIdHeaderValue(webKey.getKeyId())
-        jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256)
-
-        jws.getCompactSerialization()
-    }
-
-    private getResponseJWTPayload() {
-        def claims = new JwtClaims()
-        claims.setIssuer(configuration.issuer)
-        claims.setAudience(configuration.clientID)
-        claims.setExpirationTimeMinutesInTheFuture(10)
-        claims.setGeneratedJwtId()
-        claims.setIssuedAtToNow()
-        claims.setClaim("code","12345")
-        claims.setClaim("state", "someState")
-
-        claims
-    }
-
-    private getResponseJWTErrorPayload(String errorCode) {
-        def claims = new JwtClaims()
-        claims.setIssuer(configuration.issuer)
-        claims.setAudience(configuration.clientID)
-        claims.setExpirationTimeMinutesInTheFuture(10)
-        claims.setGeneratedJwtId()
-        claims.setIssuedAtToNow()
-        claims.setClaim("error", errorCode)
-        claims.setClaim("state", "someState")
-
-        claims
+    protected def getErrorResponsePayload(String errorCode) {
+        return "error=$errorCode&state=someState"
     }
 
     protected static def getRequestWithMaliciousOrigin(HttpMethod method, URI url) {
