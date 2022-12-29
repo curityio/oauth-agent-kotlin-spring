@@ -70,6 +70,7 @@ AUTHORIZATION_REQUEST_URL=$(jq -r .authorizationRequestUrl <<< "$JSON")
 #
 # Follow redirects until the login HTML form is returned and save cookies
 #
+echo "$AUTHORIZATION_REQUEST_URL"
 HTTP_STATUS=$(curl -i -L -s -X GET "$AUTHORIZATION_REQUEST_URL" \
 -c $CURITY_COOKIES_FILE \
 -o $RESPONSE_FILE -w '%{http_code}')

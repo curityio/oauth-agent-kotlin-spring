@@ -12,5 +12,4 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 #
 # Free the Docker resources
 #
-export FINANCIAL_GRADE_CLIENT_CA=""
-docker compose --project-name tokenhandler down
+docker compose --project-name oauthagent down

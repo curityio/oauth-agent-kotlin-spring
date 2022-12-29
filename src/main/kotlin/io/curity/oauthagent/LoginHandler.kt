@@ -17,8 +17,8 @@ class LoginHandler(
         val codeVerifier = oAuthParametersProvider.getCodeVerifier()
         val state = oAuthParametersProvider.getState()
         val encoding = "utf-8"
-        var url =
-                "client_id=${URLEncoder.encode(config.clientID, encoding)}" +
+        var url = config.authorizeEndpoint +
+                "?client_id=${URLEncoder.encode(config.clientID, encoding)}" +
                 "&redirect_uri=${URLEncoder.encode(config.redirectUri, encoding)}" +
                 "&response_type=code" +
                 "&state=${URLEncoder.encode(state, encoding)}" +
@@ -27,7 +27,7 @@ class LoginHandler(
 
         if (config.scope != null)
         {
-            url += "&scope=${config.scope}"
+            url += "&scope=${URLEncoder.encode(config.scope, encoding)}"
         }
 
         parameters?.extraParams?.forEach {

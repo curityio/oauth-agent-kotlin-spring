@@ -11,7 +11,7 @@ oauthagent:
   cookieSerializeOptions:
     httpOnly: true
     sameSite: true
-    secure: true
+    secure: false
     domain: api.example.com
     path: '/'
 

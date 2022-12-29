@@ -11,7 +11,7 @@ oauthagent:
   cookieSerializeOptions:
     httpOnly: true
     sameSite: true
-    secure: true
+    secure: false
     domain: ${COOKIE_DOMAIN:api.example.local}
     path: '/'
 

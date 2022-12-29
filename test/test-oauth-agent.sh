@@ -84,13 +84,6 @@ if [ "$HTTP_STATUS" != '401' ]; then
   echo '*** End login did not fail as expected'
   exit
 fi
-JSON=$(tail -n 1 $RESPONSE_FILE)
-echo $JSON | jq
-CODE=$(jq -r .code <<< "$JSON")
-if [ "$CODE" != 'unauthorized_request' ]; then
-   echo "*** End login returned an unexpected error code"
-   exit
-fi
 echo '3. POST to endLogin with an invalid web origin was successfully rejected'
 
 #
@@ -130,13 +123,6 @@ HTTP_STATUS=$(curl -i -s -X POST "$TOKEN_HANDLER_BASE_URL/login/start" \
 if [ "$HTTP_STATUS" != '401' ]; then
   echo '*** Start Login with an invalid web origin did not fail as expected'
   exit
-fi
-JSON=$(tail -n 1 $RESPONSE_FILE)
-echo $JSON | jq
-CODE=$(jq -r .code <<< "$JSON")
-if [ "$CODE" != 'unauthorized_request' ]; then
-   echo "*** Start login returned an unexpected error code"
-   exit
 fi
 echo '5. POST to startLogin with invalid web origin was not granted access'
 
@@ -235,11 +221,6 @@ if [ "$HTTP_STATUS" != '401' ]; then
 fi
 JSON=$(tail -n 1 $RESPONSE_FILE)
 echo $JSON | jq
-CODE=$(jq -r .code <<< "$JSON")
-if [ "$CODE" != 'unauthorized_request' ]; then
-   echo "*** User Info returned an unexpected error code"
-   exit
-fi
 echo '10. GET User Info request for an untrusted origin was handled correctly'
 
 #
@@ -337,11 +318,6 @@ if [ "$HTTP_STATUS" != '401' ]; then
 fi
 JSON=$(tail -n 1 $RESPONSE_FILE)
 echo $JSON | jq
-CODE=$(jq -r .code <<< "$JSON")
-if [ "$CODE" != 'unauthorized_request' ]; then
-   echo "*** Refresh returned an unexpected error code"
-   exit
-fi
 echo '15. POST to /refresh for an untrusted origin was handled correctly'
 
 #
@@ -468,11 +444,6 @@ if [ "$HTTP_STATUS" != '401' ]; then
 fi
 JSON=$(tail -n 1 $RESPONSE_FILE)
 echo $JSON | jq
-CODE=$(jq -r .code <<< "$JSON")
-if [ "$CODE" != 'unauthorized_request' ]; then
-   echo "*** Logout returned an unexpected error code"
-   exit
-fi
 echo '21. POST to logout with an invalid web origin was successfully rejected'
 
 #
@@ -565,7 +536,7 @@ HTTP_STATUS=$(curl -i -s -X POST "$TOKEN_HANDLER_BASE_URL/login/end" \
 -H 'accept: application/json' \
 -d 'XXX' \
 -o $RESPONSE_FILE -w '%{http_code}')
-if [ "$HTTP_STATUS" != '500' ]; then
+if [ "$HTTP_STATUS" != '400' ]; then
   echo '*** Posting malformed JSON did not fail as expected'
   exit
 fi
