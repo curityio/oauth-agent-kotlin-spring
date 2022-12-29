@@ -4,9 +4,9 @@
 # Basic automation to get tokens from the Authorization Server
 ##############################################################
 
-OAUTH_AGENT_BASE_URL='https://api.example.local:8080/oauth-agent'
-WEB_BASE_URL='https://www.example.local'
-AUTHORIZATION_SERVER_BASE_URL='https://login.example.local:8443'
+TOKEN_HANDLER_BASE_URL='http://api.example.local:8080/oauth-agent'
+WEB_BASE_URL='http://www.example.local'
+AUTHORIZATION_SERVER_BASE_URL='http://login.example.local:8443'
 RESPONSE_FILE=data/response.txt
 LOGIN_COOKIES_FILE=data/login_cookies.txt
 CURITY_COOKIES_FILE=data/curity_cookies.txt
@@ -49,7 +49,7 @@ mkdir -p data
 #
 # First get the authorization request URL
 #
-HTTP_STATUS=$(curl -k -i -s -X POST "$OAUTH_AGENT_BASE_URL/login/start" \
+HTTP_STATUS=$(curl -i -s -X POST "$TOKEN_HANDLER_BASE_URL/login/start" \
 -H "origin: $WEB_BASE_URL" \
 -H 'content-type: application/json' \
 -H 'accept: application/json' \
@@ -70,7 +70,7 @@ AUTHORIZATION_REQUEST_URL=$(jq -r .authorizationRequestUrl <<< "$JSON")
 #
 # Follow redirects until the login HTML form is returned and save cookies
 #
-HTTP_STATUS=$(curl -k -i -L -s -X GET "$AUTHORIZATION_REQUEST_URL" \
+HTTP_STATUS=$(curl -i -L -s -X GET "$AUTHORIZATION_REQUEST_URL" \
 -c $CURITY_COOKIES_FILE \
 -o $RESPONSE_FILE -w '%{http_code}')
 if [ $HTTP_STATUS != '200' ]; then
@@ -81,7 +81,7 @@ fi
 #
 # Post up the test credentials, sending then regetting cookies
 #
-HTTP_STATUS=$(curl -k -i -s -X POST "$AUTHORIZATION_SERVER_BASE_URL/authn/authentication/Username-Password" \
+HTTP_STATUS=$(curl -i -s -X POST "$AUTHORIZATION_SERVER_BASE_URL/authn/authentication/Username-Password" \
 -H 'Content-Type: application/x-www-form-urlencoded' \
 -b $CURITY_COOKIES_FILE \
 -c $CURITY_COOKIES_FILE \
@@ -98,7 +98,7 @@ fi
 #
 TOKEN=$(getHtmlFormValue 'token')
 STATE=$(getHtmlFormValue 'state')
-HTTP_STATUS=$(curl -k -i -s -X POST "$AUTHORIZATION_SERVER_BASE_URL/oauth/v2/oauth-authorize?client_id=$CLIENT_ID" \
+HTTP_STATUS=$(curl -i -s -X POST "$AUTHORIZATION_SERVER_BASE_URL/oauth/v2/oauth-authorize?client_id=$CLIENT_ID" \
 -H 'Content-Type: application/x-www-form-urlencoded' \
 -b $CURITY_COOKIES_FILE \
 -c $CURITY_COOKIES_FILE \
@@ -124,7 +124,7 @@ echo $PAGE_URL_JSON | jq
 #
 # End the login by swapping the code for tokens
 #
-HTTP_STATUS=$(curl -k -i -s -X POST "$OAUTH_AGENT_BASE_URL/login/end" \
+HTTP_STATUS=$(curl -i -s -X POST "$TOKEN_HANDLER_BASE_URL/login/end" \
 -H "origin: $WEB_BASE_URL" \
 -H 'content-type: application/json' \
 -H 'accept: application/json' \
@@ -134,11 +134,11 @@ HTTP_STATUS=$(curl -k -i -s -X POST "$OAUTH_AGENT_BASE_URL/login/end" \
 -o $RESPONSE_FILE -w '%{http_code}')
 if [ "$HTTP_STATUS" != '200' ]; then
   echo "*** Problem encountered ending the login, status $HTTP_STATUS"
-  JSON=$(tail -n 1 $RESPONSE_FILE) 
+  JSON=$(tail -n 1 $RESPONSE_FILE)
   echo $JSON | jq
-  exit 1 
+  exit 1
 fi
-JSON=$(tail -n 1 $RESPONSE_FILE) 
+JSON=$(tail -n 1 $RESPONSE_FILE)
 echo $JSON | jq
 IS_LOGGED_IN=$(jq -r .isLoggedIn <<< "$JSON")
 HANDLED=$(jq -r .handled <<< "$JSON")
@@ -146,5 +146,4 @@ if [ "$IS_LOGGED_IN" != 'true'  ] || [ "$HANDLED" != 'true' ]; then
    echo '*** End login returned an unexpected payload'
    exit 1
 fi
-
 exit 0

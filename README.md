@@ -1,4 +1,4 @@
-# A JVM based OAuth Agent for SPAs, implemented in Kotlin
+# A Kotlin OAuth Agent for SPAs
 
 [![Quality](https://img.shields.io/badge/quality-test-yellow)](https://curity.io/resources/code-examples/status/)
 [![Availability](https://img.shields.io/badge/availability-source-blue)](https://curity.io/resources/code-examples/status/)
@@ -7,7 +7,7 @@
 
 The OAuth Agent acts as a modern `Back End for Front End (BFF)` for Single Page Applications.\
 This implementation demonstrates the standard pattern for SPAs:
-
+ 
 - Strongest browser security with only `SameSite=strict` cookies
 - The OpenID Connect flow uses Authorization Code Flow (PKCE) and a client secret
 

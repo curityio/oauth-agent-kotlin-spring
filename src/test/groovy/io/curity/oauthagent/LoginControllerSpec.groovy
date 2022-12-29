@@ -33,7 +33,7 @@ class LoginControllerSpec extends TokenHandlerSpecification {
 
         then:
         response.statusCode == OK
-        response.headers['Access-Control-Allow-Origin'] == ["https://www.example.com"]
+        response.headers['Access-Control-Allow-Origin'] == ["http://www.example.com"]
     }
 
     def "Request to end login with invalid web origin should return 401 response"() {

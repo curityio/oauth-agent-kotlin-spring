@@ -1,8 +1,8 @@
-1. Consolidate other two OAuth Agents
-   Finalize README for new Spring repo
-
-2. Update Curity config, remove mTLS and add a client secret
+1. Update Curity config, remove mTLS and add a client secret
    Fix curl scripts
+
+2. Consolidate classes in other two OAuth Agents
+   Finalize README for new Spring repo
 
 3. Make SSL enabled conditional on SERVER_CERT_P12_PATH being set
    Use HTTP by default

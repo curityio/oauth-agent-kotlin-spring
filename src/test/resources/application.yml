@@ -1,8 +1,8 @@
 oauthagent:
   clientID: spa-client
   clientSecret: Password1
-  redirectUri: https://www.example.com/
-  postLogoutRedirectURI: https://www.example.com/
+  redirectUri: http://www.example.com/
+  postLogoutRedirectURI: http://www.example.com/
   scope: openid profile
 
   encKey: 4e4636356d65563e4c73233847503e3b21436e6f7629724950526f4b5e2e4e50
@@ -16,17 +16,17 @@ oauthagent:
     path: '/'
 
   trustedWebOrigins:
-  - https://www.example.com
+  - http://www.example.com
   corsEnabled: false
-  issuer: https://login.example.com/oauth
-  jwksUri: https://localhost:8443/oauth/jwks
-  authorizeEndpoint: https://localhost:8443/oauth/authorize
-  logoutEndpoint: https://login.example.com/oauth/logout
-  tokenEndpoint: https://localhost:8443/oauth/token
-  userInfoEndpoint: https://localhost:8443/oauth/userinfo
+  issuer: http://login.example.com/oauth
+  jwksUri: http://localhost:8443/oauth/jwks
+  authorizeEndpoint: http://localhost:8443/oauth/authorize
+  logoutEndpoint: http://login.example.com/oauth/logout
+  tokenEndpoint: http://localhost:8443/oauth/token
+  userInfoEndpoint: http://localhost:8443/oauth/userinfo
 
 server:
   ssl:
-    enabled: true
-    key-store: classpath:certs/example.server.test.p12
-    key-store-password: Password1
+    enabled: false
+    key-store:
+    key-store-password:

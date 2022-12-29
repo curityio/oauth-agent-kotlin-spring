@@ -7,7 +7,7 @@ how to set up the OAuth Agent together with an instance of the Curity Identity S
 
 Ensure that these tools are installed locally:
 
-- [Java 11 or later](https://openjdk.java.net/projects/jdk/11/)
+- [Java 17 or later](https://openjdk.java.net/projects/jdk/17/)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
 - [jq](https://stedolan.github.io/jq/download/)
 
@@ -63,15 +63,13 @@ Run some tests that also use the Curity Identity Server.\
 First copy a license file into the `test/idsvr` folder and then run the following commands:
 
 ```bash
-cd test/idsvr
-./deploy.sh
+./test/idsvr/deploy.sh
 ```
 
 Then run a test script that uses curl requests to verify the OAuth Agent's operations:
 
 ```bash
-cd test
-./test-oauth-agent.sh
+./test/test-oauth-agent.sh
 ```
 
 ![API Tests](api-tests.png)
@@ -81,6 +79,5 @@ cd test
 When finished with your development session, free Docker resources like this:
 
 ```bash
-cd test/idsvr
-./teardown.sh
+./test/idsvr/teardown.sh
 ```

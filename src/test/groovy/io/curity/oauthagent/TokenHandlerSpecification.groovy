@@ -43,7 +43,7 @@ class TokenHandlerSpecification extends Specification {
         getCodeVerifier() >> "verifier"
     }
 
-    static def baseUrl = "https://localhost"
+    static def baseUrl = "http://localhost"
 
     static def loginStartPath = "/login/start"
     static def loginStartUrl
@@ -55,15 +55,10 @@ class TokenHandlerSpecification extends Specification {
 
     def setupSpec() {
         wireMockServer = new WireMockServer(options()
-                .httpsPort(8443)
-                .httpDisabled(true)
-                .keystorePath("certs/example.server.test.p12")
-                .keystorePassword("Password1")
-                .keyManagerPassword("Password1")
+                .port(8443)
         )
         wireMockServer.start()
-
-        configureFor("https", "localhost", 8443)
+        configureFor("http", "localhost", 8443)
     }
 
     def cleanupSpec() {

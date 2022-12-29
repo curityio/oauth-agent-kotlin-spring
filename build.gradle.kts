@@ -55,8 +55,6 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	useJUnitPlatform()
 	jvmArgs = listOf(
-		"-Djavax.net.ssl.trustStore=src/test/resources/certs/example.server.test.p12",
-		"-Djavax.net.ssl.trustStorePassword=Password1",
 		"-Dsun.net.http.allowRestrictedHeaders=true"
 	)
 	include("**/*Spec.class")
