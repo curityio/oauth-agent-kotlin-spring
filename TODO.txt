@@ -1,20 +1,20 @@
-VERSION UPDATES
----------------
 1. Consolidate other two OAuth Agents
+   Finalize README for new Spring repo
 
 2. Update Curity config, remove mTLS and add a client secret
    Fix curl scripts
-   Then there is a new deliverable at least
 
 3. Make SSL enabled conditional on SERVER_CERT_P12_PATH being set
    Use HTTP by default
 
 4. Deployment testing against branches for Node.js and both Kotlin OAuth agents
 
-5. Fix v3.0 issues with injecting OAuthAgentConfiguration
+5. Fix Spring 3 issues with injecting OAuthAgentConfiguration
 
    Wiremock has problems, meaning standalone should be used.
    But then test configuration is no longer autowired
    https://github.com/wiremock/wiremock/issues/1760
 
 6. Next.js OAuth Agent
+
+7. .NET OAuth Agent to get started on
