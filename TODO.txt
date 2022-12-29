@@ -1,23 +1,16 @@
 TODAY
 -----
-1. spa-deployments update
-   Add example configuration properties to README files
-
-2. Kotlin: make SSL enabled conditional on SERVER_CERT_P12_PATH being set
-
-INVESTIGATE
------------
-3. Fix Node.js issues with node-fetch
-   Maybe add esmoduleinterop
-
-4. Fix Spring 3 issues with injecting OAuthAgentConfiguration
+1. Fix Spring 3 issues with injecting OAuthAgentConfiguration
 
    Wiremock has problems, meaning standalone should be used.
    But then test configuration is no longer autowired
    https://github.com/wiremock/wiremock/issues/1760
 
+2. Fix Node.js issues with node-fetch
+   Maybe add esmoduleinterop
+
+3. Kotlin: make SSL enabled conditional on SERVER_CERT_P12_PATH being set
+
 TOMORROW
 --------
-5. .NET OAuth Agent
-
-6. Next.js OAuth Agent
+1. .NET OAuth Agent
