@@ -3,7 +3,7 @@ package io.curity.oauthagent
 import org.springframework.stereotype.Service
 
 @Service
-class CookieWriter(
+class CookieBuilder(
         config: OAuthAgentConfiguration,
         private val cookieEncrypter: CookieEncrypter,
         private val cookieName: CookieName
@@ -17,18 +17,18 @@ class CookieWriter(
         val cookiesList = mutableListOf<String>()
         cookiesList.add(cookieEncrypter.getEncryptedCookie(cookieName.csrf, csrfCookieValue))
         cookiesList.add(cookieEncrypter.getCookieForUnset(cookieName.tempLoginData))
-        writeTokensToCookies(cookiesList, response)
+        addTokensToCookies(cookiesList, response)
         return cookiesList
     }
 
     suspend fun refreshCookies(response: TokenResponse): List<String> {
 
         val cookiesList = mutableListOf<String>()
-        writeTokensToCookies(cookiesList, response)
+        addTokensToCookies(cookiesList, response)
         return cookiesList
     }
 
-    private suspend fun writeTokensToCookies(cookiesList: MutableList<String>, response: TokenResponse) {
+    private suspend fun addTokensToCookies(cookiesList: MutableList<String>, response: TokenResponse) {
 
         cookiesList.add(cookieEncrypter.getEncryptedCookie(cookieName.accessToken, response.accessToken))
 

@@ -25,7 +25,7 @@ class LoginController(
         private val loginHandler: LoginHandler,
         private val cookieName: CookieName,
         private val cookieEncrypter: CookieEncrypter,
-        private val cookieWriter: CookieWriter,
+        private val cookieBuilder: CookieBuilder,
         private val objectMapper: ObjectMapper,
         private val authorizationServerClient: AuthorizationServerClient,
         private val requestValidator: RequestValidator
@@ -85,8 +85,8 @@ class LoginController(
             csrfToken = if (csrfCookie == null)
             {
                 generateRandomString()
-            } else
-            {
+            } else {
+
                 try {
                     // Avoid setting a new value if the user opens two browser tabs and signs in on both
                     cookieEncrypter.decryptValueFromCookie(csrfCookie)
@@ -99,7 +99,7 @@ class LoginController(
                 }
             }
 
-            val cookiesToSet = cookieWriter.createCookies(tokenResponse, csrfToken)
+            val cookiesToSet = cookieBuilder.createCookies(tokenResponse, csrfToken)
             response.headers[SET_COOKIE] = cookiesToSet
             isLoggedIn = true
 

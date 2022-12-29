@@ -22,8 +22,6 @@ class AuthorizationServerClient(
         try
         {
             val body = "client_id=${config.clientID}&client_secret=${config.clientSecret}&grant_type=authorization_code&redirect_uri=${config.redirectUri}&code=${code}&code_verifier=${codeVerifier}"
-            println("*** DEBUG ***")
-            println(body)
             return client.post()
                 .uri(config.tokenEndpoint)
                 .header("Content-Type", "application/x-www-form-urlencoded")

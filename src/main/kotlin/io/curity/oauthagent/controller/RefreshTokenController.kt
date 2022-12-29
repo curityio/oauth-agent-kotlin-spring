@@ -17,8 +17,8 @@ class RefreshTokenController(
     private val requestValidator: RequestValidator,
     private val cookieEncrypter: CookieEncrypter,
     private val cookieName: CookieName,
-    private val authorizationServerClient: AuthorizationServerClient,
-    private val cookieWriter: CookieWriter
+    private val cookieBuilder: CookieBuilder,
+    private val authorizationServerClient: AuthorizationServerClient
 )
 {
     @PostMapping("", produces = ["application/json"])
@@ -32,7 +32,7 @@ class RefreshTokenController(
 
         val decryptedToken = cookieEncrypter.decryptValueFromCookie(refreshTokenCookie)
         val tokenResponse = authorizationServerClient.refreshAccessToken(decryptedToken)
-        val cookiesToSet = cookieWriter.refreshCookies(tokenResponse)
+        val cookiesToSet = cookieBuilder.refreshCookies(tokenResponse)
 
         response.headers[SET_COOKIE] = cookiesToSet
     }
