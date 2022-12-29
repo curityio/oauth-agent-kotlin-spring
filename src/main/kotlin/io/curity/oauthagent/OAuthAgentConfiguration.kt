@@ -13,7 +13,8 @@ data class OAuthAgentConfigurationProperties(
     var endpointsPrefix: String,
 
     // Client settings
-    var clientID: String = "",
+    var clientID: String,
+    var clientSecret: String,
     var redirectUri: String,
     var postLogoutRedirectURI: String?,
     var scope: String?,
@@ -23,7 +24,6 @@ data class OAuthAgentConfigurationProperties(
     var jwksUri: String,
     var logoutEndpoint: String,
     var authorizeEndpoint: String,
-    var authorizeExternalEndpoint: String,
     var tokenEndpoint: String,
     var userInfoEndpoint: String,
 
@@ -53,6 +53,7 @@ class OAuthAgentConfiguration(configurationProperties: OAuthAgentConfigurationPr
 
     // Client settings
     val clientID = configurationProperties.clientID
+    val clientSecret = configurationProperties.clientSecret
     val redirectUri = configurationProperties.redirectUri
     val postLogoutRedirectURI = configurationProperties.postLogoutRedirectURI
     val scope = configurationProperties.scope
@@ -62,7 +63,6 @@ class OAuthAgentConfiguration(configurationProperties: OAuthAgentConfigurationPr
     val jwksUri = configurationProperties.jwksUri
     val logoutEndpoint = configurationProperties.logoutEndpoint
     val authorizeEndpoint = configurationProperties.authorizeEndpoint
-    val authorizeExternalEndpoint = configurationProperties.authorizeExternalEndpoint
     val tokenEndpoint = configurationProperties.tokenEndpoint
     val userInfoEndpoint = configurationProperties.userInfoEndpoint
 

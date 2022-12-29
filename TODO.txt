@@ -1,23 +1,20 @@
 VERSION UPDATES
 ---------------
-1. Node.js updates, including version 18 Dockerfile and possibly insecure flag
+1. Consolidate other two OAuth Agents
 
-2. Deployment testing against branches
+2. Update Curity config, remove mTLS and add a client secret
+   Fix curl scripts
+   Then there is a new deliverable at least
 
-LATER
------
-1. Make SSL enabled conditional on SERVER_CERT_P12_PATH being set
+3. Make SSL enabled conditional on SERVER_CERT_P12_PATH being set
+   Use HTTP by default
 
-2. Fix v3.0 plugin issues with testing, eg wiremock
+4. Deployment testing against branches for Node.js and both Kotlin OAuth agents
+
+5. Fix v3.0 issues with injecting OAuthAgentConfiguration
+
    Wiremock has problems, meaning standalone should be used.
-   But then test configuration no longer loads
+   But then test configuration is no longer autowired
    https://github.com/wiremock/wiremock/issues/1760
 
-    implementation("org.apache.groovy:groovy:4.0.7")
-	implementation("org.apache.groovy:groovy-json:4.0.7")
-	testImplementation("org.springframework.boot:spring-boot-starter-test:3.0.1")
-	testImplementation(platform("org.spockframework:spock-bom:2.3-groovy-4.0"))
-	testImplementation("org.spockframework:spock-core:2.3-groovy-4.0")
-	testImplementation("org.spockframework:spock-spring:2.3-groovy-4.0")
-	testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
-	testImplementation("org.apache.httpcomponents:httpclient:4.5.14")
+6. Next.js OAuth Agent

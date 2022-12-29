@@ -1,5 +1,6 @@
 oauthagent:
   clientID: spa-client
+  clientSecret: Password1
   redirectUri: https://www.example.com/
   postLogoutRedirectURI: https://www.example.com/
   scope: openid profile
@@ -20,15 +21,9 @@ oauthagent:
   issuer: https://login.example.com/oauth
   jwksUri: https://localhost:8443/oauth/jwks
   authorizeEndpoint: https://localhost:8443/oauth/authorize
-  authorizeExternalEndpoint: https://login.example.com/oauth/authorize
   logoutEndpoint: https://login.example.com/oauth/logout
   tokenEndpoint: https://localhost:8443/oauth/token
   userInfoEndpoint: https://localhost:8443/oauth/userinfo
-
-  ssl:
-    key-store: classpath:certs/example.client.test.p12
-    key-store-password: Password1
-    trust-store: classpath:certs/example.ca.test.pem
 
 server:
   ssl:

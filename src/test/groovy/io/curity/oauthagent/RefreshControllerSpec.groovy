@@ -5,7 +5,6 @@ import org.springframework.web.client.HttpClientErrorException
 
 import static org.springframework.http.HttpMethod.POST
 import static org.springframework.http.HttpStatus.BAD_REQUEST
-import static org.springframework.http.HttpStatus.FORBIDDEN
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
 

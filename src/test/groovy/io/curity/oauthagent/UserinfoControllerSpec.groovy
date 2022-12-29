@@ -4,8 +4,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.web.client.HttpClientErrorException
 
 import static org.springframework.http.HttpMethod.GET
-import static org.springframework.http.HttpMethod.POST
-import static org.springframework.http.HttpStatus.FORBIDDEN
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
 

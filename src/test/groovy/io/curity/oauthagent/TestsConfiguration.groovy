@@ -12,7 +12,6 @@ class TestsConfiguration {
     RsaJsonWebKey jsonWebKey() {
         def rsaJsonWebKey = RsaJwkGenerator.generateJwk(2048)
         rsaJsonWebKey.setKeyId("key1")
-
         rsaJsonWebKey
     }
 }

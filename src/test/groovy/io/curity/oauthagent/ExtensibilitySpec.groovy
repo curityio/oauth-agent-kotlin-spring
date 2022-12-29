@@ -1,6 +1,5 @@
 package io.curity.oauthagent
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*
 import static groovy.json.JsonOutput.toJson
 import static org.springframework.http.HttpMethod.POST
 import static org.springframework.http.HttpStatus.*
@@ -17,13 +16,6 @@ class ExtensibilitySpec extends TokenHandlerSpecification {
         ]
 
         def request = getRequestWithValidOrigin(POST, loginStartURI, toJson(options))
-        stubFor(post(stubs.getPAREndpointPath())
-                .withRequestBody(containing("prompt=login"))
-                .willReturn(aResponse()
-                .withBody(toJson([request_uri: "parRequestURI", expires_in: 100]))
-                .withHeader("Content-Type", "application/json")
-                .withStatus(200)
-        ))
 
         when:
         def response = client.exchange(request, String.class)
@@ -57,14 +49,6 @@ class ExtensibilitySpec extends TokenHandlerSpecification {
         ]
 
         def request = getRequestWithValidOrigin(POST, loginStartURI, toJson(options))
-        stubFor(post(stubs.getPAREndpointPath())
-                .withRequestBody(containing("ui_locales=fr"))
-                .withRequestBody(containing("claims=$claimsJson"))
-                .willReturn(aResponse()
-                        .withBody(toJson([request_uri: "parRequestURI", expires_in: 100]))
-                        .withHeader("Content-Type", "application/json")
-                        .withStatus(200)
-                ))
 
         when:
         def response = client.exchange(request, String.class)

@@ -1,6 +1,5 @@
 package io.curity.oauthagent
 
-import org.jose4j.jwk.RsaJwkGenerator
 import org.springframework.http.HttpHeaders
 import org.springframework.web.client.HttpClientErrorException
 import static groovy.json.JsonOutput.toJson
@@ -11,8 +10,6 @@ import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNAUTHORIZED
 
 class LoginControllerSpec extends TokenHandlerSpecification {
-
-    static def maliciousJsonWebKey = RsaJwkGenerator.generateJwk(2048)
 
     def "Sending an OPTIONS request with wrong Origin should return 401 response without CORS headers"() {
         given:
@@ -125,7 +122,6 @@ class LoginControllerSpec extends TokenHandlerSpecification {
         responseCookies.size() == 5
     }
 
-    /*
     def "Posting a malicious authorization response to end login endpoint should return a 400 invalid_request response"() {
         given: // request to login/start is performed to get proper cookies
         def startLoginRequest = getRequestWithValidOrigin(POST, loginStartURI)
@@ -140,7 +136,7 @@ class LoginControllerSpec extends TokenHandlerSpecification {
         def request = getRequestWithValidOrigin(
                 POST,
                 loginEndURI,
-                toJson([pageUrl: "${configuration.redirectUri}?response=$maliciousResponsePayload" ]),
+                toJson([pageUrl: "${configuration.redirectUri}?$maliciousResponsePayload" ]),
                 cookieHeaders
         )
 
@@ -152,7 +148,7 @@ class LoginControllerSpec extends TokenHandlerSpecification {
         response.statusCode == BAD_REQUEST
         def responseBody = json.parseText(response.responseBodyAsString)
         responseBody["code"] == "invalid_request"
-    }*/
+    }
 
     def "Posting to end login with session cookies should return proper 200 response"() {
         given:

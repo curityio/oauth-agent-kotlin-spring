@@ -3,7 +3,6 @@ package io.curity.oauthagent
 import com.github.tomakehurst.wiremock.WireMockServer
 import groovy.json.JsonSlurper
 import org.apache.http.impl.client.HttpClients
-import org.jose4j.jwk.RsaJsonWebKey
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -34,9 +33,6 @@ class TokenHandlerSpecification extends Specification {
 
     @Autowired
     OAuthAgentConfiguration configuration
-
-    @Autowired
-    RsaJsonWebKey rsaJsonWebKey
 
     @LocalServerPort
     def port

@@ -1,11 +1,14 @@
 package io.curity.oauthagent.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.curity.oauthagent.*
-import io.curity.oauthagent.handlers.authorizationrequest.AuthorizationRequestHandler
-import io.curity.oauthagent.exception.AuthorizationResponseException
 import io.curity.oauthagent.exception.CookieDecryptionException
-import io.curity.oauthagent.handlers.authorizationresponse.AuthorizationResponseHandler
-import org.jose4j.jwt.JwtClaims
+import io.curity.oauthagent.exception.InvalidRequestException
+import io.curity.oauthagent.exception.InvalidStateException
+import io.curity.oauthagent.exception.MissingTempLoginDataException
+import io.curity.oauthagent.AuthorizationRequestData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.http.HttpHeaders.SET_COOKIE
 import org.springframework.http.server.reactive.ServerHttpResponse
 import org.springframework.http.server.reactive.ServerHttpRequest
@@ -19,10 +22,11 @@ import org.springframework.web.bind.annotation.RestController
 @CrossOrigin
 @RequestMapping("/\${oauthagent.endpointsPrefix}/login")
 class LoginController(
-        private val authorizationRequestHandler: AuthorizationRequestHandler,
-        private val authorizationResponseHandler: AuthorizationResponseHandler,
+        private val loginHandler: LoginHandler,
         private val cookieName: CookieName,
         private val cookieEncrypter: CookieEncrypter,
+        private val cookieWriter: CookieWriter,
+        private val objectMapper: ObjectMapper,
         private val authorizationServerClient: AuthorizationServerClient,
         private val requestValidator: RequestValidator
 )
@@ -39,7 +43,7 @@ class LoginController(
             ValidateRequestOptions(requireCsrfHeader = false)
         )
 
-        val authorizationRequestData = authorizationRequestHandler.createRequest(body)
+        val authorizationRequestData = loginHandler.createAuthorizationRequest(body)
 
         val encryptedCookieValue =
             cookieEncrypter.getEncryptedCookie(cookieName.tempLoginData, authorizationRequestData.toJSONString())
@@ -61,7 +65,7 @@ class LoginController(
             ValidateRequestOptions(requireCsrfHeader = false)
         )
 
-        val queryParams = authorizationResponseHandler.handleResponse(body.pageUrl)
+        val queryParams = loginHandler.handleAuthorizationResponse(body.pageUrl)
         val isOAuthResponse = queryParams.state != null && queryParams.code != null
 
         val isLoggedIn: Boolean
@@ -69,9 +73,13 @@ class LoginController(
 
         if (isOAuthResponse)
         {
-            val tempLoginData = request.getCookie(cookieName.tempLoginData)
+            val authorizationData = getStoredAuthorizationData(request)
+            if (authorizationData.state != queryParams.state) {
+                throw InvalidStateException()
+            }
+
             val tokenResponse =
-                authorizationServerClient.getTokens(tempLoginData, queryParams.code!!, queryParams.state!!)
+                authorizationServerClient.redeemCodeForTokens(queryParams.code!!, authorizationData.codeVerifier)
 
             val csrfCookie = request.getCookie(cookieName.csrf)
             csrfToken = if (csrfCookie == null)
@@ -91,12 +99,12 @@ class LoginController(
                 }
             }
 
-            val cookiesToSet = authorizationServerClient.getCookiesForTokenResponse(tokenResponse, true, csrfToken)
+            val cookiesToSet = cookieWriter.createCookies(tokenResponse, csrfToken)
             response.headers[SET_COOKIE] = cookiesToSet
-
             isLoggedIn = true
-        } else
-        {
+
+        } else {
+
             // During a page reload, return the existing anti forgery token
             isLoggedIn = request.getCookie(cookieName.accessToken) != null
             if (isLoggedIn)
@@ -112,25 +120,25 @@ class LoginController(
         )
     }
 
+    private suspend fun getStoredAuthorizationData(request: ServerHttpRequest): AuthorizationRequestData {
+
+        val tempLoginData = request.getCookie(cookieName.tempLoginData) ?: throw MissingTempLoginDataException()
+
+        return withContext(Dispatchers.Default) {
+            val result = kotlin.runCatching {
+                return@runCatching objectMapper.readValue(
+                        cookieEncrypter.decryptValueFromCookie(tempLoginData),
+                        AuthorizationRequestData::class.java
+                )
+            }
+
+            result.getOrNull() ?: throw InvalidRequestException("Cookie value can't be decrypted or deserialized")
+        }
+    }
+
     private fun ServerHttpRequest.getCookie(cookieName: String): String? =
         this.cookies[cookieName]?.first()?.value
-
-    private fun getAuthorizationResponseError(responseClaims: JwtClaims): AuthorizationResponseException {
-
-        var errorCode = responseClaims.getStringClaimValue("error")
-        var errorDescription = responseClaims.getStringClaimValue("error_description")
-        if (errorCode.isNullOrBlank()) {
-            errorCode = "authorization_response_error"
-        }
-        if (errorDescription.isNullOrBlank()) {
-            errorDescription = "Login failed at the Authorization Server"
-        }
-
-        return AuthorizationResponseException(errorCode, errorDescription)
-    }
 }
-
-data class OAuthQueryParams(val code: String?, val state: String?)
 
 class StartAuthorizationParameters(
     val extraParams: List<ExtraParams>?

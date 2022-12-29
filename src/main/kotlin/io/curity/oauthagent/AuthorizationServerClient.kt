@@ -1,12 +1,8 @@
 package io.curity.oauthagent
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
-import io.curity.oauthagent.handlers.authorizationrequest.AuthorizationRequestData
 import io.curity.oauthagent.exception.*
 import io.curity.oauthagent.utilities.Grant
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
@@ -17,41 +13,15 @@ import org.springframework.web.reactive.function.client.awaitExchange
 @Service
 class AuthorizationServerClient(
     private val client: WebClient,
-    private val objectMapper: ObjectMapper,
-    private val cookieEncrypter: CookieEncrypter,
     private val config: OAuthAgentConfiguration,
-    private val cookieName: CookieName
+
 )
 {
-    private val idTokenOptions = config.cookieSerializeOptions.copy(path = "/${config.endpointsPrefix}/claims")
-    private val refreshTokenOptions = config.cookieSerializeOptions.copy(path = "/${config.endpointsPrefix}/refresh")
-
-    suspend fun getTokens(tempLoginData: String?, code: String, state: String): TokenResponse
+    suspend fun redeemCodeForTokens(code: String, codeVerifier: String): TokenResponse
     {
-        if (tempLoginData == null)
-        {
-            throw MissingTempLoginDataException()
-        }
-
-        val loginData = withContext(Dispatchers.Default) {
-            val result = kotlin.runCatching {
-                return@runCatching objectMapper.readValue(
-                    cookieEncrypter.decryptValueFromCookie(tempLoginData),
-                    AuthorizationRequestData::class.java
-                )
-            }
-
-            result.getOrNull() ?: throw InvalidRequestException("Cookie value can't be decrypted or deserialized")
-        }
-
-        if (loginData.state != state)
-        {
-            throw InvalidStateException()
-        }
-
         try
         {
-            val body = "client_id=${config.clientID}&grant_type=authorization_code&redirect_uri=${config.redirectUri}&code=${code}&code_verifier=${loginData.codeVerifier}"
+            val body = "client_id=${config.clientID}&client_secret=${config.clientSecret}&grant_type=authorization_code&redirect_uri=${config.redirectUri}&code=${code}&code_verifier=${codeVerifier}"
             return client.post()
                 .uri(config.tokenEndpoint)
                 .header("Content-Type", "application/x-www-form-urlencoded")
@@ -62,26 +32,6 @@ class AuthorizationServerClient(
         {
             throw AuthorizationServerException("Connectivity problem during an Authorization Code Grant", exception)
         }
-    }
-
-    private suspend inline fun <reified T : Any> handleAuthorizationServerResponse(
-        response: ClientResponse,
-        grant: Grant
-    ): T
-    {
-        if (response.statusCode().is5xxServerError)
-        {
-            val text = response.awaitBody<String>()
-            throw AuthorizationServerException("Server error response in $grant: $text")
-        }
-
-        if (response.statusCode().is4xxClientError)
-        {
-            val text = response.awaitBody<String>()
-            throw AuthorizationClientException.create(grant, response.statusCode(), text)
-        }
-
-        return response.awaitBody()
     }
 
     suspend fun getUserInfo(accessToken: String): Map<String, Any>
@@ -107,7 +57,7 @@ class AuthorizationServerClient(
             return client.post()
                 .uri(config.tokenEndpoint)
                 .header("Content-Type", "application/x-www-form-urlencoded")
-                .bodyValue("grant_type=refresh_token&refresh_token=$refreshToken&client_id=${config.clientID}")
+                .bodyValue("client_id=${config.clientID}&client_secret=${config.clientSecret}&grant_type=refresh_token&refresh_token=$refreshToken")
                 .awaitExchange { response -> handleAuthorizationServerResponse(response, Grant.RefreshToken) }
 
         } catch (exception: WebClientRequestException)
@@ -116,37 +66,24 @@ class AuthorizationServerClient(
         }
     }
 
-    suspend fun getCookiesForTokenResponse(
-        response: TokenResponse,
-        unsetTempLoginDataCookie: Boolean,
-        csrfCookieValue: String?
-    ): List<String>
+    private suspend inline fun <reified T : Any> handleAuthorizationServerResponse(
+            response: ClientResponse,
+            grant: Grant
+    ): T
     {
-        val cookiesList = mutableListOf<String>()
-        cookiesList.add(cookieEncrypter.getEncryptedCookie(cookieName.accessToken, response.accessToken))
-
-        if (csrfCookieValue != null)
+        if (response.statusCode().is5xxServerError)
         {
-            cookiesList.add(cookieEncrypter.getEncryptedCookie(cookieName.csrf, csrfCookieValue))
+            val text = response.awaitBody<String>()
+            throw AuthorizationServerException("Server error response in $grant: $text")
         }
 
-        if (unsetTempLoginDataCookie)
+        if (response.statusCode().is4xxClientError)
         {
-            cookiesList.add(cookieEncrypter.getCookieForUnset(cookieName.tempLoginData))
+            val text = response.awaitBody<String>()
+            throw AuthorizationClientException.create(grant, response.statusCode(), text)
         }
 
-        if (response.refreshToken != null)
-        {
-            cookiesList.add(
-                cookieEncrypter.getEncryptedCookie(cookieName.auth, response.refreshToken, refreshTokenOptions))
-        }
-
-        if (response.idToken != null)
-        {
-            cookiesList.add(cookieEncrypter.getEncryptedCookie(cookieName.idToken, response.idToken, idTokenOptions))
-        }
-
-        return cookiesList
+        return response.awaitBody()
     }
 }
 
