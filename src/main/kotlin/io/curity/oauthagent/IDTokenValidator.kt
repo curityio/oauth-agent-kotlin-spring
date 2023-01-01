@@ -10,7 +10,7 @@ class IDTokenValidator(private val config: OAuthAgentConfiguration) {
 
     /*
      * Make some sanity checks to ensure that the issuer and audience are configured correctly
-     * The ID token is received over a trusted connection so the signature is not verified
+     * The ID token is received over a trusted back channel connection so its signature does not need verifying
      * https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation
      */
     fun validate(idToken: String) {
