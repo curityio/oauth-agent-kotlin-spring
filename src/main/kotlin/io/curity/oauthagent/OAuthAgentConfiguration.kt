@@ -19,7 +19,6 @@ data class OAuthAgentConfigurationProperties(
 
     // Authorization Server settings
     var issuer: String,
-    var jwksUri: String,
     var logoutEndpoint: String,
     var authorizeEndpoint: String,
     var tokenEndpoint: String,
@@ -58,7 +57,6 @@ class OAuthAgentConfiguration(configurationProperties: OAuthAgentConfigurationPr
 
     // Authorization Server settings
     val issuer = configurationProperties.issuer
-    val jwksUri = configurationProperties.jwksUri
     val logoutEndpoint = configurationProperties.logoutEndpoint
     val authorizeEndpoint = configurationProperties.authorizeEndpoint
     val tokenEndpoint = configurationProperties.tokenEndpoint

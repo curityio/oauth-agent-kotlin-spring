@@ -19,7 +19,6 @@ oauthagent:
   - ${TRUSTED_WEB_ORIGIN:http://www.example.local}
   corsEnabled: ${CORS_ENABLED:true}
   issuer: ${ISSUER:http://login.example.local:8443/oauth/v2/oauth-anonymous}
-  jwksUri: ${JWKS_URI:http://login.example.local:8443/oauth/v2/oauth-anonymous/jwks}
   authorizeEndpoint: ${AUTHORIZE_ENDPOINT:http://login.example.local:8443/oauth/v2/oauth-authorize}
   logoutEndpoint: ${LOGOUT_ENDPOINT:http://login.example.local:8443/oauth/v2/oauth-session/logout}
   tokenEndpoint: ${TOKEN_ENDPOINT:http://login.example.local:8443/oauth/v2/oauth-token}

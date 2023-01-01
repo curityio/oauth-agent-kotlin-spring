@@ -1,12 +1,6 @@
 package io.curity.oauthagent
 
 import io.curity.oauthagent.utilities.CustomCorsProcessor
-import org.jose4j.jwa.AlgorithmConstraints
-import org.jose4j.jwk.HttpsJwks
-import org.jose4j.jws.AlgorithmIdentifiers
-import org.jose4j.jwt.consumer.JwtConsumer
-import org.jose4j.jwt.consumer.JwtConsumerBuilder
-import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.runApplication
@@ -32,25 +26,6 @@ class OAuthAgentApplication {
 
         val corsProcessor = CustomCorsProcessor()
         return CorsWebFilter(source, corsProcessor)
-    }
-
-    @Bean
-    fun jwtConsumer(config: OAuthAgentConfiguration): JwtConsumer
-    {
-        val httpsJkws = HttpsJwks(config.jwksUri)
-        val httpsJwksKeyResolver = HttpsJwksVerificationKeyResolver(httpsJkws)
-
-        return JwtConsumerBuilder()
-            .setRequireExpirationTime()
-            .setAllowedClockSkewInSeconds(30)
-            .setExpectedIssuer(config.issuer)
-            .setExpectedAudience(config.clientID)
-            .setVerificationKeyResolver(httpsJwksKeyResolver)
-            .setJwsAlgorithmConstraints(
-                AlgorithmConstraints.ConstraintType.PERMIT,
-                AlgorithmIdentifiers.RSA_USING_SHA256
-            )
-            .build()
     }
 
     @Bean

@@ -28,6 +28,7 @@ class LoginController(
         private val cookieBuilder: CookieBuilder,
         private val objectMapper: ObjectMapper,
         private val authorizationServerClient: AuthorizationServerClient,
+        private val idTokenValidator: IDTokenValidator,
         private val requestValidator: RequestValidator
 )
 {
@@ -78,8 +79,8 @@ class LoginController(
                 throw InvalidStateException()
             }
 
-            val tokenResponse =
-                authorizationServerClient.redeemCodeForTokens(queryParams.code!!, authorizationData.codeVerifier)
+            val tokenResponse = authorizationServerClient.redeemCodeForTokens(queryParams.code!!, authorizationData.codeVerifier)
+            idTokenValidator.validate(tokenResponse.idToken!!)
 
             val csrfCookie = request.getCookie(cookieName.csrf)
             csrfToken = if (csrfCookie == null)

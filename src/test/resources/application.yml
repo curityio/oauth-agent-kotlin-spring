@@ -19,7 +19,6 @@ oauthagent:
   - http://www.example.com
   corsEnabled: false
   issuer: http://login.example.com/oauth
-  jwksUri: http://localhost:8443/oauth/jwks
   authorizeEndpoint: http://localhost:8443/oauth/authorize
   logoutEndpoint: http://login.example.com/oauth/logout
   tokenEndpoint: http://localhost:8443/oauth/token
