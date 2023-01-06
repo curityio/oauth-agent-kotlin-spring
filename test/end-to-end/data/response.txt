@@ -1,0 +1,10 @@
+HTTP/1.1 400 Bad Request
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers
+Access-Control-Allow-Origin: http://www.example.local
+Access-Control-Allow-Credentials: true
+Content-Type: application/json
+Content-Length: 83
+
+{"code":"server_error","message":"A technical problem occurred in the OAuth Agent"}

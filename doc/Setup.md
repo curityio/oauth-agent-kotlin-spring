@@ -63,21 +63,13 @@ Run some tests that also use the Curity Identity Server.\
 First copy a license file into the `test/idsvr` folder and then run the following commands:
 
 ```bash
-./test/idsvr/deploy.sh
+./test/end-to-end/idsvr/deploy.sh
 ```
 
 Then run a test script that uses curl requests to verify the OAuth Agent's operations:
 
 ```bash
-./test/test-oauth-agent.sh
+./test/end-to-end/test-oauth-agent.sh
 ```
 
 ![API Tests](api-tests.png)
-
-## Free Docker Resources
-
-When finished with your development session, free Docker resources like this:
-
-```bash
-./test/idsvr/teardown.sh
-```
