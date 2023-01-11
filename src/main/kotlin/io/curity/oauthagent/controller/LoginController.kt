@@ -80,7 +80,9 @@ class LoginController(
             }
 
             val tokenResponse = authorizationServerClient.redeemCodeForTokens(queryParams.code!!, authorizationData.codeVerifier)
-            idTokenValidator.validate(tokenResponse.idToken!!)
+            if (!tokenResponse.idToken.isNullOrBlank()) {
+                idTokenValidator.validate(tokenResponse.idToken)
+            }
 
             val csrfCookie = request.getCookie(cookieName.csrf)
             csrfToken = if (csrfCookie == null)
