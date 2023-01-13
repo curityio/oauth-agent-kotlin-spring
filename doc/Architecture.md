@@ -28,7 +28,7 @@ The OAuth Agent responds with a JSON containing the `authorizationRequestUrl` fi
 Response:
 ```json
 {
-  "authorizationRequestUrl": "https://idsvr.example.com/oauth/authorize?client_id=spa-client&redirect_uri=http%3A%2F%2Fwww.example.local%2F&response_type=code&state=20KRWyfCUlgM2ylJM2xYU4EDt2Tj8SHUZnMsjGtz37YbYKwXf2iF0HLGeb6jnsxl&code_challenge=c8LDLpU4fYHrpctf4fR4u--rJaQpFdyUfXGKIAG1VNI&code_challenge_method=S256&scope=openid profile"
+  "authorizationRequestUrl": "https://login.example.com/oauth/authorize?client_id=spa-client&redirect_uri=http%3A%2F%2Fwww.example.local%2F&response_type=code&state=20KRWyfCUlgM2ylJM2xYU4EDt2Tj8SHUZnMsjGtz37YbYKwXf2iF0HLGeb6jnsxl&code_challenge=c8LDLpU4fYHrpctf4fR4u--rJaQpFdyUfXGKIAG1VNI&code_challenge_method=S256&scope=openid profile"
 }
 ```
 
@@ -56,9 +56,9 @@ This endpoint should be be called by the SPA on any page load. The SPA sends the
 
 #### Example request
 
-```http
+```text
 POST https://api.example.com/oauth-agent/login/end
-pageUrl=http://www.example.com?code=abcdef&state=qwerty
+?pageUrl=http://www.example.com?code=abcdef&state=qwerty
 ```
 
 The response will contain a few `Set-Cookie` headers.
@@ -69,7 +69,7 @@ Endpoint which sends the access token to the user info endpoint, then returns da
 
 #### Example
 
-```http
+```text
 GET http://api.example.com/oauth-agent/userInfo
 Cookie: example-at=2558e7806c0523fd96d105...
 ```
@@ -92,7 +92,7 @@ Endpoint which returns claims of the ID token contained in the session cookie.
 
 #### Example
 
-```http
+```text
 GET https://api.example.com/oauth-agent/claims
 Cookie: example-id=2558e7806c0523fd96d105...
 ```
@@ -104,7 +104,7 @@ Response
   "exp":1626263589,
   "nbf":1626259989,
   "jti":"34e76304-0bc3-46ee-bc70-e21685eb5282",
-  "iss":"https://idsvr.example.com/oauth",
+  "iss":"https://login.example.com/oauth",
   "aud":"spa-client",
   "sub":"0abd0b16b309a3a034af8494aa0092aa42813e635f194c795df5006db90743e8",
   "auth_time":1626259937,
