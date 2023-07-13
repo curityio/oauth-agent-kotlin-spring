@@ -6,3 +6,4 @@ certs/example*
 test/data
 license.json
 out
+data
